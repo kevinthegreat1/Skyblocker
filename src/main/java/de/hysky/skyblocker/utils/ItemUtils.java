@@ -1,7 +1,10 @@
 package de.hysky.skyblocker.utils;
 
+import com.mojang.brigadier.Command;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import de.hysky.skyblocker.SkyblockerMod;
 import de.hysky.skyblocker.config.SkyblockerConfigManager;
+import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.item.ItemStack;
@@ -11,6 +14,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,11 +23,27 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
+
 public class ItemUtils {
-    private final static Pattern WHITESPACES = Pattern.compile("^\\s*$");
+    private static final Logger LOGGER = LoggerFactory.getLogger(ItemUtils.class);
+    private static final Pattern WHITESPACES = Pattern.compile("^\\s*$");
     public static final String EXTRA_ATTRIBUTES = "ExtraAttributes";
     public static final String ID = "id";
     public static final String UUID = "uuid";
+
+    public static void init() {
+        if (SkyblockerConfigManager.get().general.debug) {
+            ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> dispatcher.register(literal(SkyblockerMod.NAMESPACE)
+                    .then(literal("debug")
+                            .then(literal("dumpHeldItemNbt").executes(context -> {
+                                LOGGER.info("[Skyblocker Debug] Held Item Nbt: {}", context.getSource().getPlayer().getMainHandStack().writeNbt(new NbtCompound()));
+                                return Command.SINGLE_SUCCESS;
+                            }))
+                    )
+            ));
+        }
+    }
 
     public static List<Text> getTooltip(ItemStack item) {
         MinecraftClient client = MinecraftClient.getInstance();

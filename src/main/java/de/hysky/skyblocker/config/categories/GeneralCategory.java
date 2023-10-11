@@ -503,6 +503,16 @@ public class GeneralCategory {
 								.controller(ConfigUtils::createBooleanController)
 								.build())
 						.build())
+
+				//Debug Mode
+				.option(Option.<Boolean>createBuilder()
+						.name(Text.translatable("text.autoconfig.skyblocker.option.general.debug"))
+						.description(OptionDescription.of(Text.translatable("text.autoconfig.skyblocker.option.general.debug.@Tooltip")))
+						.binding(defaults.general.debug,
+								() -> config.general.debug,
+								newValue -> config.general.debug = newValue)
+						.controller(ConfigUtils::createBooleanController)
+						.build())
 				.build();
 	}
 }

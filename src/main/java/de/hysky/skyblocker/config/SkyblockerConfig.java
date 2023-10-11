@@ -162,6 +162,9 @@ public class SkyblockerConfig {
 		public boolean hideStatusEffectOverlay = false;
 
 		@SerialEntry
+		public boolean debug = false;
+
+		@SerialEntry
 		public TabHudConf tabHud = new TabHudConf();
 
 		@SerialEntry
