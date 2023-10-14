@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 
 import de.hysky.skyblocker.mixin.accessor.PlayerListHudAccessor;
 import de.hysky.skyblocker.utils.Utils;
+import de.hysky.skyblocker.utils.scheduler.Scheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +27,10 @@ public class PlayerListMgr {
 
 	private static List<PlayerListEntry> playerList;
     private static String footer;
+
+	public static void init() {
+		Scheduler.INSTANCE.scheduleCyclic(PlayerListMgr::updateList, 20);
+	}
 
 	public static void updateList() {
 

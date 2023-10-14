@@ -4,6 +4,7 @@ package de.hysky.skyblocker.utils.discord;
 import de.hysky.skyblocker.config.SkyblockerConfigManager;
 import de.hysky.skyblocker.events.SkyblockEvents;
 import de.hysky.skyblocker.utils.Utils;
+import de.hysky.skyblocker.utils.scheduler.Scheduler;
 import meteordevelopment.discordipc.DiscordIPC;
 import meteordevelopment.discordipc.RichPresence;
 import org.slf4j.Logger;
@@ -31,6 +32,7 @@ public class DiscordRPCManager {
             startTimeStamp = System.currentTimeMillis();
             initAndUpdatePresence(true);
         });
+        Scheduler.INSTANCE.scheduleCyclic(DiscordRPCManager::updateDataAndPresence, 100);
     }
 
     /**

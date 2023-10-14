@@ -3,6 +3,7 @@ package de.hysky.skyblocker.skyblock.dungeon;
 import de.hysky.skyblocker.config.SkyblockerConfigManager;
 import de.hysky.skyblocker.utils.Utils;
 import de.hysky.skyblocker.utils.render.RenderHelper;
+import de.hysky.skyblocker.utils.scheduler.Scheduler;
 import de.hysky.skyblocker.utils.tictactoe.TicTacToeUtils;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
@@ -32,6 +33,7 @@ public class TicTacToe {
 
 	public static void init() {
 		WorldRenderEvents.BEFORE_DEBUG_RENDER.register(TicTacToe::solutionRenderer);
+		Scheduler.INSTANCE.scheduleCyclic(TicTacToe::tick, 4);
 	}
 
 	public static void tick() {

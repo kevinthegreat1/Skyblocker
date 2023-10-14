@@ -17,6 +17,7 @@ import de.hysky.skyblocker.skyblock.special.SpecialEffects;
 import de.hysky.skyblocker.skyblock.spidersden.Relics;
 import de.hysky.skyblocker.skyblock.tabhud.TabHud;
 import de.hysky.skyblocker.skyblock.tabhud.util.PlayerListMgr;
+import de.hysky.skyblocker.utils.DebugUtils;
 import de.hysky.skyblocker.utils.ItemUtils;
 import de.hysky.skyblocker.utils.NEURepo;
 import de.hysky.skyblocker.utils.Utils;
@@ -31,6 +32,8 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
+import org.apache.logging.log4j.LogManager;
+import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
 
@@ -68,9 +71,10 @@ public class SkyblockerMod implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ClientTickEvents.END_CLIENT_TICK.register(this::tick);
-        Utils.init();
-        HotbarSlotLock.init();
         SkyblockerConfigManager.init();
+        Utils.init();
+        DebugUtils.init();
+        HotbarSlotLock.init();
         PriceInfoTooltip.init();
         WikiLookup.init();
         ItemRegistry.init();
@@ -105,15 +109,10 @@ public class SkyblockerMod implements ClientModInitializer {
         ItemUtils.init();
         ItemProtection.init();
         ItemRarityBackgrounds.init();
+        PlayerListMgr.init();
         containerSolverManager.init();
         statusBarTracker.init();
-        Scheduler.INSTANCE.scheduleCyclic(Utils::update, 20);
-        Scheduler.INSTANCE.scheduleCyclic(DiscordRPCManager::updateDataAndPresence, 100);
-        Scheduler.INSTANCE.scheduleCyclic(TicTacToe::tick, 4);
-        Scheduler.INSTANCE.scheduleCyclic(LividColor::update, 10);
-        Scheduler.INSTANCE.scheduleCyclic(BackpackPreview::tick, 50);
-        Scheduler.INSTANCE.scheduleCyclic(DwarvenHud::update, 40);
-        Scheduler.INSTANCE.scheduleCyclic(PlayerListMgr::updateList, 20);
+        LogManager.getLogger("de.hysky.skyblocker").debug("[Skyblocker] Initialized version " + VERSION);
     }
 
     /**

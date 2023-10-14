@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import de.hysky.skyblocker.events.SkyblockEvents;
+import de.hysky.skyblocker.utils.scheduler.Scheduler;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import de.hysky.skyblocker.skyblock.item.PriceInfoTooltip;
 import de.hysky.skyblocker.skyblock.rift.TheRift;
@@ -119,6 +120,7 @@ public class Utils {
         ClientPlayConnectionEvents.JOIN.register(Utils::onClientWorldJoin);
         ClientReceiveMessageEvents.ALLOW_GAME.register(Utils::onChatMessage);
         ClientReceiveMessageEvents.GAME_CANCELED.register(Utils::onChatMessage); // Somehow this works even though onChatMessage returns a boolean
+        Scheduler.INSTANCE.scheduleCyclic(Utils::update, 20);
     }
 
     /**

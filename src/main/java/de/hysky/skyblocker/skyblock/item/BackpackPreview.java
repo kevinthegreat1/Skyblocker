@@ -3,6 +3,7 @@ package de.hysky.skyblocker.skyblock.item;
 import com.mojang.blaze3d.systems.RenderSystem;
 import de.hysky.skyblocker.SkyblockerMod;
 import de.hysky.skyblocker.utils.Utils;
+import de.hysky.skyblocker.utils.scheduler.Scheduler;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
@@ -45,6 +46,7 @@ public class BackpackPreview {
                 updateStorage(handledScreen);
             }
         });
+        Scheduler.INSTANCE.scheduleCyclic(BackpackPreview::tick, 50);
     }
 
     public static void tick() {

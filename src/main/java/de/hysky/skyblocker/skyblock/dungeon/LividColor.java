@@ -3,6 +3,7 @@ package de.hysky.skyblocker.skyblock.dungeon;
 import de.hysky.skyblocker.config.SkyblockerConfigManager;
 import de.hysky.skyblocker.utils.Utils;
 import de.hysky.skyblocker.utils.scheduler.MessageScheduler;
+import de.hysky.skyblocker.utils.scheduler.Scheduler;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
@@ -16,6 +17,7 @@ public class LividColor {
                 tenTicks = 8;
             }
         });
+        Scheduler.INSTANCE.scheduleCyclic(LividColor::update, 10);
     }
 
     public static void update() {

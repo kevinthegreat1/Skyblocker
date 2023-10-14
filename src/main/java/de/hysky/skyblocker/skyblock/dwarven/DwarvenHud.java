@@ -55,6 +55,7 @@ public class DwarvenHud {
             render(HudCommsWidget.INSTANCE, context, SkyblockerConfigManager.get().locations.dwarvenMines.dwarvenHud.x,
                     SkyblockerConfigManager.get().locations.dwarvenMines.dwarvenHud.y, commissionList);
         });
+        Scheduler.INSTANCE.scheduleCyclic(DwarvenHud::update, 40);
     }
 
     public static IntIntPair getDimForConfig(List<Commission> commissions) {
