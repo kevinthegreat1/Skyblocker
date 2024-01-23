@@ -33,7 +33,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.nbt.NbtTagSizeTracker;
+import net.minecraft.nbt.NbtSizeTracker;
 import net.minecraft.util.Util;
 
 public class MuseumItemCache {
@@ -93,7 +93,7 @@ public class MuseumItemCache {
 						for (Map.Entry<String, JsonElement> donatedSet : donatedSets.entrySet()) {
 							//Item is plural here because the nbt is a list
 							String itemsData = donatedSet.getValue().getAsJsonObject().get("items").getAsJsonObject().get("data").getAsString();
-							NbtList items = NbtIo.readCompressed(new ByteArrayInputStream(Base64.getDecoder().decode(itemsData)), NbtTagSizeTracker.ofUnlimitedBytes()).getList("i", NbtElement.COMPOUND_TYPE);
+							NbtList items = NbtIo.readCompressed(new ByteArrayInputStream(Base64.getDecoder().decode(itemsData)), NbtSizeTracker.ofUnlimitedBytes()).getList("i", NbtElement.COMPOUND_TYPE);
 
 							for (int i = 0; i < items.size(); i++) {
 								NbtCompound tag = items.getCompound(i).getCompound("tag");
@@ -142,9 +142,7 @@ public class MuseumItemCache {
 	public static void tick(String profileId) {
 		if (loaded.isDone()) {
 			String uuid = UndashedUuid.toString(MinecraftClient.getInstance().getSession().getUuidOrNull());
-			Object2ObjectOpenHashMap<String, ProfileMuseumData> playerData = MUSEUM_ITEM_CACHE.computeIfAbsent(uuid, uuid1 -> Util.make(new Object2ObjectOpenHashMap<>(), map -> {
-				map.put(profileId, ProfileMuseumData.EMPTY);
-			}));
+			Object2ObjectOpenHashMap<String, ProfileMuseumData> playerData = MUSEUM_ITEM_CACHE.computeIfAbsent(uuid, uuid1 -> Util.make(new Object2ObjectOpenHashMap<>(), map -> map.put(profileId, ProfileMuseumData.EMPTY)));
 
 			if (playerData.get(profileId).stale()) updateData4ProfileMember(uuid, profileId);
 		}
