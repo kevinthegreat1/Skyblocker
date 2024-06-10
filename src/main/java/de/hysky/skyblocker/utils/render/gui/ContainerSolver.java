@@ -4,6 +4,7 @@ import de.hysky.skyblocker.SkyblockerMod;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.item.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -12,7 +13,15 @@ import java.util.regex.Pattern;
  * Abstract class for gui solvers. Extend this class to add a new gui solver, like terminal solvers or experiment solvers.
  */
 public abstract class ContainerSolver extends AbstractContainerMatcher {
-    protected ContainerSolver(String titlePattern) {
+    /**
+     * @deprecated Only for {@link ContainerSolverManager}. Use {@link #ContainerSolver(String)} instead.
+     */
+    @Deprecated
+    protected ContainerSolver() {
+        super();
+    }
+
+    protected ContainerSolver(@NotNull String titlePattern) {
         super(titlePattern);
     }
 

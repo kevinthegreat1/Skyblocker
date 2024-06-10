@@ -19,6 +19,8 @@ import de.hysky.skyblocker.utils.Utils;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectRBTreeMap;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
+import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
 import net.minecraft.client.util.math.MatrixStack;
@@ -31,11 +33,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Manager class for {@link ContainerSolver}s like terminal solvers and experiment solvers. To add a new gui solver, extend {@link ContainerSolver} and register it in {@link #ContainerSolverManager()}.
+ * Manager class for {@link ContainerSolver}s like terminal solvers and experiment solvers. To add a new gui solver, extend {@link ContainerSolver} and register it to {@link #SOLVERS}.
  */
-public class ContainerSolverManager {
+public class ContainerSolverManager extends ContainerSolver {
     private static final Pattern PLACEHOLDER_PATTERN = Pattern.compile("");
-    private final ContainerSolver[] solvers;
+    public final Event<ContainerSolver> SOLVERS = EventFactory.createArrayBacked(ContainerSolver.class, this::updateManagerAndGetInvoker);
+    private ContainerSolver[] solvers;
     private ContainerSolver currentSolver = null;
     private String[] groups;
     private List<ColorHighlight> highlights;
@@ -44,21 +47,9 @@ public class ContainerSolverManager {
      */
     private int screenId = 0;
 
+    @SuppressWarnings("deprecation")
     public ContainerSolverManager() {
-        solvers = new ContainerSolver[]{
-                new ColorTerminal(),
-                new OrderTerminal(),
-                new StartsWithTerminal(),
-                new LightsOnTerminal(),
-                new CroesusHelper(),
-                new CroesusProfit(),
-                new ChronomatronSolver(),
-                new SuperpairsSolver(),
-                UltrasequencerSolver.INSTANCE,
-                new NewYearCakeBagHelper(),
-                NewYearCakesHelper.INSTANCE,
-                new ChocolateFactorySolver()
-        };
+        super();
     }
 
     public ContainerSolver getCurrentSolver() {
@@ -66,6 +57,19 @@ public class ContainerSolverManager {
     }
 
     public void init() {
+        SOLVERS.register(new ColorTerminal());
+        SOLVERS.register(new OrderTerminal());
+        SOLVERS.register(new StartsWithTerminal());
+        SOLVERS.register(new LightsOnTerminal());
+        SOLVERS.register(new CroesusHelper());
+        SOLVERS.register(new CroesusProfit());
+        SOLVERS.register(new ChronomatronSolver());
+        SOLVERS.register(new SuperpairsSolver());
+        SOLVERS.register(UltrasequencerSolver.INSTANCE);
+        SOLVERS.register(new NewYearCakeBagHelper());
+        SOLVERS.register(NewYearCakesHelper.INSTANCE);
+        SOLVERS.register(new ChocolateFactorySolver());
+
         ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
             if (Utils.isOnSkyblock() && screen instanceof GenericContainerScreen genericContainerScreen) {
                 ScreenEvents.afterRender(screen).register((screen1, context, mouseX, mouseY, delta) -> {
@@ -75,15 +79,24 @@ public class ContainerSolverManager {
                     onDraw(context, genericContainerScreen.getScreenHandler().slots.subList(0, genericContainerScreen.getScreenHandler().getRows() * 9));
                     matrices.pop();
                 });
-                ScreenEvents.remove(screen).register(screen1 -> clearScreen());
-                onSetScreen(genericContainerScreen);
+                ScreenEvents.remove(screen).register(screen1 -> reset());
+                SOLVERS.invoker().start(genericContainerScreen);
             } else {
-                clearScreen();
+                reset();
             }
         });
     }
 
-    public void onSetScreen(@NotNull GenericContainerScreen screen) {
+    /**
+     * Saves the new solvers list to {@link #solvers} and returns this instance as the invoker.
+     */
+    public ContainerSolver updateManagerAndGetInvoker(ContainerSolver[] solvers) {
+        this.solvers = solvers;
+        return this;
+    }
+
+    @Override
+    public void start(@NotNull GenericContainerScreen screen) {
         String screenName = screen.getTitle().getString();
         Matcher matcher = PLACEHOLDER_PATTERN.matcher(screenName);
         for (ContainerSolver solver : solvers) {
@@ -104,10 +117,11 @@ public class ContainerSolverManager {
                 }
             }
         }
-        clearScreen();
+        reset();
     }
 
-    public void clearScreen() {
+    @Override
+    public void reset() {
         if (currentSolver != null) {
             currentSolver.reset();
             currentSolver = null;
@@ -145,10 +159,20 @@ public class ContainerSolverManager {
     }
 
     private Int2ObjectMap<ItemStack> slotMap(List<Slot> slots) {
-    	Int2ObjectMap<ItemStack> slotMap = new Int2ObjectRBTreeMap<>();
+        Int2ObjectMap<ItemStack> slotMap = new Int2ObjectRBTreeMap<>();
         for (int i = 0; i < slots.size(); i++) {
             slotMap.put(i, slots.get(i).getStack());
         }
         return slotMap;
+    }
+
+    @Override
+    protected boolean isEnabled() {
+        return false;
+    }
+
+    @Override
+    protected List<ColorHighlight> getColors(String[] groups, Int2ObjectMap<ItemStack> slots) {
+        return List.of();
     }
 }
