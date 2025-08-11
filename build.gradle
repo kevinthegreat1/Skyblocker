@@ -330,7 +330,10 @@ spotless {
 				// An optional non-capturing group is introduced around the dot before the captured stem + the stem itself + the rest of the key to allow for the case where the stem is not present, e.g. "skyblocker.config" from "skyblocker.config.debug"
 				/("skyblocker\.config(?:\.(\w+)(?:\.[\w.@\[\]]+)?)?":\s*"(?:[^"]|\\")*?",)(?=\s*"skyblocker\.config\.(?!\2\.))/,
 				'$1\n'
-		final List<String> configCategories = ["chat", "crimsonIsle", "dungeons", "farming", "foraging", "general", "helpers", "hunting", "mining", "misc", "otherLocations", "slayer", "uiAndVisuals"]
+		final List<String> configCategories = new groovy.json.JsonSlurper()
+				.parseText(new File("src/main/resources/assets/skyblocker/lang/en_us.json").text)
+				.findAll { it.key.startsWith("skyblocker.config.") && it.key.count('.') == 2 }
+				.collect { it.key.split('\\.')[2] }
 		replaceRegex \
 				"Separate different fouth stems if the first three stems are skyblocker.config.[configCategory]",
 				// By simply adding skyblocker.config.[configCategory]. in front of the stem we try to match
